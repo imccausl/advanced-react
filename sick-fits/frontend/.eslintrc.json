@@ -1,0 +1,13 @@
+{
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "plugins": ["babel", "prettier"],
+  "rules": {
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "semi": ["error", "never"],
+    "react/react-in-jsx-scope": "off",
+    "babel/semi": 0,
+    "max-len": ["error", { "code": 80 }],
+    "no-unused-expressions": ["error", { "allowTaggedTemplates": true }]
+  }
+}
