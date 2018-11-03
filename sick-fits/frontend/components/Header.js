@@ -20,9 +20,12 @@ const Logo = styled.h1`
   font-size: 4rem;
   margin-left: 2rem;
   position: relative;
-  *, *:before, *:after {
-  z-index: 2;
-  transform: skew(-7deg);
+  *,
+  *:before,
+  *:after {
+    z-index: 2;
+    transform: skew(-7deg);
+  }
 
   a {
     padding: 0.5rem 1rem;
@@ -34,8 +37,7 @@ const Logo = styled.h1`
 
   @media (max-width: 1300px) {
     margin: 0;
-    text-aliimport Nav from './Nav'
-    gn: center;
+    text-align: center;
   }
 `
 
