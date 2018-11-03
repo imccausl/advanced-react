@@ -17,9 +17,22 @@ server.express.use((req, res, next) => {
 
   if (token) {
     const { userID } = jwt.verify(token, process.env.APP_SECRET)
-    console.log(userID, token)
     req.userID = userID
   }
+
+  next()
+})
+
+// populate the user on each request
+server.express.use(async (req, res, next) => {
+  if (!req.userID) return next()
+
+  const user = await db.query.user(
+    { where: { id: req.userID } },
+    "{ id, permissions, email, name }",
+  )
+
+  req.user = user
 
   next()
 })
