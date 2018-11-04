@@ -1,4 +1,4 @@
-import { Query } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import PropTypes from 'prop-types'
 
@@ -13,6 +13,17 @@ const ALL_USERS_QUERY = gql`
       name
       email
       permissions
+    }
+  }
+`
+
+const UPDATE_PERMISSIONS_MUTATION = gql`
+  mutation updatePermissions($permissions: [Permission], $userId: ID!) {
+    updatePermissions(permissions: $permissions, userId: $userId) {
+      id
+      permissions
+      name
+      email
     }
   }
 `
@@ -69,7 +80,7 @@ class UserPermissions extends React.Component {
     permissions: this.props.user.permissions,
   }
 
-  handlePermissionChange = (e) => {
+  handlePermissionChange = (e, updatePermissions) => {
     const checkbox = e.target
     const { permissions } = this.state
 
@@ -85,8 +96,7 @@ class UserPermissions extends React.Component {
       )
     }
 
-    this.setState({ permissions: updatedPermissions })
-    console.log(updatedPermissions)
+    this.setState({ permissions: updatedPermissions }, updatePermissions)
   }
 
   render() {
@@ -94,25 +104,54 @@ class UserPermissions extends React.Component {
     const { permissions } = this.state
 
     return (
-      <tr>
-        <td>{user.name}</td>
-        <td>{user.email}</td>
-        {possiblePermissions.map(permission => (
-          <td key={`${user.id}--${permission}`}>
-            <label htmlFor={`${user.id}-permission-${permission}`}>
-              <input
-                type="checkbox"
-                checked={permissions.includes(permission)}
-                value={permission}
-                onChange={this.handlePermissionChange}
-              />
-            </label>
-          </td>
-        ))}
-        <td>
-          <SickButton>Update</SickButton>
-        </td>
-      </tr>
+      <Mutation
+        mutation={UPDATE_PERMISSIONS_MUTATION}
+        variables={{
+          permissions: this.state.permissions,
+          userId: this.props.user.id,
+        }}
+      >
+        {(updatePermissions, { loading, error }) => (
+          <>
+            {error && (
+              <tr>
+                <td colSpan="8">
+                  <Error error={error} />
+                </td>
+              </tr>
+            )}
+            <tr>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              {possiblePermissions.map(permission => (
+                <td key={`${user.id}--${permission}`}>
+                  <label htmlFor={`${user.id}-permission-${permission}`}>
+                    <input
+                      id={`${user.id}-permission-${permission}`}
+                      type="checkbox"
+                      checked={permissions.includes(permission)}
+                      value={permission}
+                      onChange={(e) => {
+                        this.handlePermissionChange(e, updatePermissions)
+                      }}
+                    />
+                  </label>
+                </td>
+              ))}
+              <td>
+                <SickButton
+                  type="button"
+                  disabled={loading}
+                  onClick={updatePermissions}
+                >
+                  Updat
+                  {loading ? 'ing' : 'e'}
+                </SickButton>
+              </td>
+            </tr>
+          </>
+        )}
+      </Mutation>
     )
   }
 }

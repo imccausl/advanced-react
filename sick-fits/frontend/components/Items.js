@@ -13,6 +13,9 @@ const ALL_ITEMS_QUERY = gql`
       id
       title
       price
+      user {
+        id
+      }
       description
       image
       largeImage

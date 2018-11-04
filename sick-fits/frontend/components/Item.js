@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
+import { Query } from 'react-apollo'
 import PropTypes from 'prop-types'
 import Link from 'next/link'
+import gql from 'graphql-tag'
 
 import formatMoney from '../lib/formatMoney'
+import { CURRENT_USER_QUERY } from './User'
 
 import Title from './styles/Title'
 import ItemStyles from './styles/ItemStyles'
@@ -26,30 +29,50 @@ class Item extends Component {
         {item.image && <img src={item.image} alt={item.title} />}
 
         <Title>
-          <Link href={{
-            pathname: '/item',
-            query: { id: item.id },
-          }}
+          <Link
+            href={{
+              pathname: '/item',
+              query: { id: item.id },
+            }}
           >
-            <a>
-              {item.title}
-            </a>
+            <a>{item.title}</a>
           </Link>
         </Title>
         <PriceTag>{formatMoney(item.price)}</PriceTag>
         <p>{item.description}</p>
 
-        <div className="buttonList">
-          <Link href={{
-            pathname: '/update',
-            query: { id: item.id },
+        <Query query={CURRENT_USER_QUERY}>
+          {({ data }) => {
+            let isOwner = false
+            let hasEditPermission = false
+            let hasDeletePermission = false
+
+            if (data.me) {
+              isOwner = data.me.id === item.user.id
+              hasEditPermission = data.me.permissions.some(permission => ['ADMIN', 'ITEMUPDATE'].includes(permission))
+              hasDeletePermission = data.me.permissions.some(permission => ['ADMIN', 'ITEMDELETE'].includes(permission))
+            }
+
+            return (
+              <div className="buttonList">
+                {isOwner || hasEditPermission ? (
+                  <Link
+                    href={{
+                      pathname: '/update',
+                      query: { id: item.id },
+                    }}
+                  >
+                    <a>Edit</a>
+                  </Link>
+                ) : null}
+                <button type="button">Add to Cart</button>
+                {isOwner || hasDeletePermission ? (
+                  <DeleteItem id={item.id}>Delete Item</DeleteItem>
+                ) : null}
+              </div>
+            )
           }}
-          >
-            <a>Edit</a>
-          </Link>
-          <button>Add to Cart</button>
-          <DeleteItem id={item.id}>Delete Item</DeleteItem>
-        </div>
+        </Query>
       </ItemStyles>
     )
   }
