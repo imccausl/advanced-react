@@ -25,8 +25,7 @@ const Inner = styled.div`
   padding: 2rem;
 `
 
-injectGlobal(
-  `
+injectGlobal`
   @font-face {
     font-family: 'radnika_next';
     src: url('/static/radnikanext-medium-webfont.woff2')
@@ -56,8 +55,7 @@ injectGlobal(
     text-decoration: none;
     color: ${theme.black}
   }
-`,
-)
+`
 
 const Page = (props) => {
   const { children } = props
