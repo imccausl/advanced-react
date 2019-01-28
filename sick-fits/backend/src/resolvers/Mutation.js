@@ -283,7 +283,8 @@ const Mutations = {
     if (!cartItem) throw new Error("No cart item found!")
 
     // make sure they own that cart item
-    if (cartItem.user.id !== ctx.request.userId) {
+    console.log(cartItem.user.id, ctx.request.userID)
+    if (cartItem.user.id !== ctx.request.userID) {
       throw new Error("Not your item!")
     }
 

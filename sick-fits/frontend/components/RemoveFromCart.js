@@ -21,28 +21,50 @@ const BigButton = styled.button`
     cursor: pointer;
   }
 `
-const RemoveFromCart = ({ id }) => (
-  <Mutation
-    mutation={REMOVE_FROM_CART_MUTATION}
-    variables={{ id }}
-    refetchQueries={CURRENT_USER_QUERY}
-  >
-    {(removeFromCart, { loading, error }) => (
-      <BigButton
-        title="Delete Item"
-        disabled={loading}
-        onClick={() => {
-          removeFromCart().catch(err => alert(err))
+
+class RemoveFromCart extends React.Component {
+  static propTypes = {
+    id: PropTypes.string.isRequired,
+  }
+
+  update = (cache, payload) => {
+    const data = cache.readQuery({ query: CURRENT_USER_QUERY })
+    console.log(data)
+
+    const cartItemId = payload.data.removeFromCart.id
+    data.me.cart = data.me.cart.filter(cartItem => cartItem.id !== cartItemId)
+
+    cache.writeQuery({ query: CURRENT_USER_QUERY, data })
+  }
+
+  render() {
+    const { id } = this.props
+    return (
+      <Mutation
+        mutation={REMOVE_FROM_CART_MUTATION}
+        variables={{ id }}
+        update={this.update}
+        optimisticResponse={{
+          __typename: 'Mutation',
+          removeFromCart: {
+            id,
+          },
         }}
       >
-        &times;
-      </BigButton>
-    )}
-  </Mutation>
-)
-
-RemoveFromCart.propTypes = {
-  id: PropTypes.string.isRequired,
+        {(removeFromCart, { loading, error }) => (
+          <BigButton
+            title="Delete Item"
+            disabled={loading}
+            onClick={() => {
+              removeFromCart().catch(err => alert(err))
+            }}
+          >
+            &times;
+          </BigButton>
+        )}
+      </Mutation>
+    )
+  }
 }
 
 export default RemoveFromCart
