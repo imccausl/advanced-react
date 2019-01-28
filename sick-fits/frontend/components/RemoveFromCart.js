@@ -22,7 +22,23 @@ const BigButton = styled.button`
   }
 `
 const RemoveFromCart = ({ id }) => (
-  <BigButton title="Delete Item">&times;</BigButton>
+  <Mutation
+    mutation={REMOVE_FROM_CART_MUTATION}
+    variables={{ id }}
+    refetchQueries={CURRENT_USER_QUERY}
+  >
+    {(removeFromCart, { loading, error }) => (
+      <BigButton
+        title="Delete Item"
+        disabled={loading}
+        onClick={() => {
+          removeFromCart().catch(err => alert(err))
+        }}
+      >
+        &times;
+      </BigButton>
+    )}
+  </Mutation>
 )
 
 RemoveFromCart.propTypes = {

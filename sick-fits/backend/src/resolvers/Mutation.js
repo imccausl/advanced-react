@@ -287,7 +287,7 @@ const Mutations = {
       throw new Error("Not your item!")
     }
 
-    // Delete the cart
+    // Delete the cart item
     return ctx.db.mutation.deleteCartItem(
       {
         where: { id: args.id },
